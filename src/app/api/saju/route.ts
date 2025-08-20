@@ -31,7 +31,7 @@ export interface SajuResponse {
 }
 
 // 간단한 사주 계산 함수
-function calculateSaju(birthData: SajuRequest): { saju: string; elements: any } {
+function calculateSaju(birthData: SajuRequest): { saju: string; elements: { year: string; month: string; day: string; hour: string } } {
   const { birthYear, birthMonth, birthDay, birthHour } = birthData;
   
   const yearElement = getYearElement(birthYear);
@@ -73,7 +73,7 @@ function getHourElement(hour: number): string {
 }
 
 // OpenAI API를 사용하여 운세 생성
-async function generateTodayFortune(birthData: SajuRequest, saju: string): Promise<TodayFortune> {
+async function generateTodayFortune(birthData: SajuRequest, _saju: string): Promise<TodayFortune> {
   try {
     const prompt = generateSajuFortunePrompt(birthData);
 

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+
 
 export default function Home() {
   return (
@@ -15,13 +15,7 @@ export default function Home() {
             rel="noopener noreferrer"
           >
             Powered by{' '}
-            <svg
-              className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-              src="/next.svg"
-              alt="Next.js Logo"
-              width={180}
-              height={37}
-            />
+            <span className="text-xl font-bold">Next.js</span>
           </a>
         </div>
       </div>
