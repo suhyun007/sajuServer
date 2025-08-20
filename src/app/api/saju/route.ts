@@ -75,7 +75,9 @@ function getHourElement(hour: number): string {
 // OpenAI API를 사용하여 운세 생성
 async function generateTodayFortune(birthData: SajuRequest, _saju: string): Promise<TodayFortune> {
   try {
+    console.log('=== OpenAI API 호출 시작 ===');
     const prompt = generateSajuFortunePrompt(birthData);
+    console.log('생성된 프롬프트:', prompt);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -94,13 +96,18 @@ async function generateTodayFortune(birthData: SajuRequest, _saju: string): Prom
     });
 
     const responseText = completion.choices[0]?.message?.content || '';
+    console.log('OpenAI 원본 응답:', responseText);
     
     // JSON 파싱 시도
     try {
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
+        console.log('JSON 매치 결과:', jsonMatch[0]);
         const parsed = JSON.parse(jsonMatch[0]);
+        console.log('파싱된 JSON:', JSON.stringify(parsed, null, 2));
         return parsed.today_fortune;
+      } else {
+        console.log('JSON 패턴 매치 실패');
       }
     } catch (parseError) {
       console.error('JSON 파싱 오류:', parseError);
@@ -118,7 +125,9 @@ async function generateTodayFortune(birthData: SajuRequest, _saju: string): Prom
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== 사주 API 호출 시작 ===');
     const body: SajuRequest = await request.json();
+    console.log('요청 데이터:', JSON.stringify(body, null, 2));
     
     // 입력 검증
     if (!body.birthYear || !body.birthMonth || !body.birthDay || !body.birthHour || !body.gender) {
@@ -173,20 +182,34 @@ export async function POST(request: NextRequest) {
     
     // 사주 계산
     const sajuData = calculateSaju(body);
+    console.log('사주 계산 결과:', JSON.stringify(sajuData, null, 2));
     
     // OpenAI를 통한 오늘의 운세 생성
+    console.log('OpenAI API 호출 시작...');
     const todayFortune = await generateTodayFortune(body, sajuData.saju);
+    console.log('OpenAI 응답 결과:', JSON.stringify(todayFortune, null, 2));
     
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: {
         ...sajuData,
         today_fortune: todayFortune,
       },
-    });
+    };
+    
+    console.log('=== 최종 응답 ===');
+    console.log('응답 데이터:', JSON.stringify(responseData, null, 2));
+    console.log('==================');
+    
+    return NextResponse.json(responseData);
     
   } catch (error) {
-    console.error('사주 계산 중 오류 발생:', error);
+    console.error('=== 사주 API 오류 발생 ===');
+    console.error('오류 타입:', error?.constructor?.name || 'Unknown');
+    console.error('오류 메시지:', String(error));
+    console.error('오류 스택:', error instanceof Error ? error.stack : '스택 정보 없음');
+    console.error('==================');
+    
     return NextResponse.json(
       { 
         success: false, 
