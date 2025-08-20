@@ -106,26 +106,13 @@ async function generateTodayFortune(birthData: SajuRequest, _saju: string): Prom
       console.error('JSON 파싱 오류:', parseError);
     }
 
-    // JSON 파싱에 실패한 경우 기본 응답 반환
-    return {
-      overall: "오늘은 평온한 하루가 될 것입니다.",
-      wealth: "재정적으로 안정적인 하루입니다.",
-      health: "건강에 특별한 문제는 없을 것입니다.",
-      love: "연애운이 평범한 하루입니다.",
-      advice: "차분한 마음으로 하루를 보내시기 바랍니다."
-    };
+    // JSON 파싱에 실패한 경우 에러 반환
+    console.log('JSON 파싱 실패');
+    throw new Error('OpenAI 응답 파싱 실패: 유효하지 않은 JSON 형식');
 
   } catch (error) {
     console.error('OpenAI API 호출 오류:', error);
-    
-    // API 오류 시 기본 응답 반환
-    return {
-      overall: "오늘은 평온한 하루가 될 것입니다.",
-      wealth: "재정적으로 안정적인 하루입니다.",
-      health: "건강에 특별한 문제는 없을 것입니다.",
-      love: "연애운이 평범한 하루입니다.",
-      advice: "차분한 마음으로 하루를 보내시기 바랍니다."
-    };
+    throw error; // 에러를 상위로 전파
   }
 }
 
@@ -201,7 +188,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('사주 계산 중 오류 발생:', error);
     return NextResponse.json(
-      { success: false, error: '서버 오류가 발생했습니다.' },
+      { 
+        success: false, 
+        error: `서버 오류가 발생했습니다: ${String(error)}` 
+      },
       { status: 500 }
     );
   }
