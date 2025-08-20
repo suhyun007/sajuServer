@@ -12,7 +12,10 @@ export function generateSajuFortunePrompt(birthData: SajuRequest): string {
   const timeText = birthData.birthHour >= 12 ? '오후' : '오전';
   const hour12 = birthData.birthHour > 12 ? birthData.birthHour - 12 : birthData.birthHour;
   
-  return `${genderText} ${birthData.birthYear}년 ${birthData.birthMonth}월 ${birthData.birthDay}일 ${timeText} ${hour12}시 ${birthData.birthMinute}분에 태어난 사람의 사주를 통한 오늘의 운세를 알려줘 아래의 json 형태로 알려줘 
+  return `${genderText} ${birthData.birthYear}년 ${birthData.birthMonth}월 ${birthData.birthDay}일 ${timeText} ${hour12}시 ${birthData.birthMinute}분에 
+  태어난 사람의 사주를 통한 오늘의 운세를 알려줘 
+  좀 더 부드럽게 말해줘
+  아래의 json 형태로 알려줘 
 
 {
   "today_fortune": {
