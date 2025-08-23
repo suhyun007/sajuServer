@@ -19,11 +19,40 @@ export function generateSajuFortunePrompt(birthData: SajuRequest): string {
 
 {
   "today_fortune": {
-    "overall": "오늘 운세를 적어줘 ",
-    "wealth": "금전적인 부분에 대한거",
-    "health": "건강 상태",
-    "love": "연애 운",
-    "advice": "조언"
+    "overall": "오늘 운세의 전체적인 내용",
+    "wealth": "오늘의 금전 운세",
+    "health": "오늘의 건강 운세",
+    "love": "오늘의 연애 운세",
+    "business": "오늘의 사업 운세",
+    "study": "오늘의 공부 운세",
+    "advice": "오늘의 조언 한마디"
+  },
+  "month_fortune": {
+    "overall": "이번 달 운세의 전체적인 내용",
+    "wealth": "이번 달의 금전 운세",
+    "health": "이번 달의 건강 운세",
+    "love": "이번 달의 연애 운세",
+    "business": "이번 달의 사업 운세",
+    "study": "이번 달의 공부 운세",
+    "advice": "이번 달의 조언 한마디"
+  },
+  "year_fortune": {
+    "overall": "올해 운세의 전체적인 내용",
+    "wealth": "올해의 금전 운세",
+    "health": "올해의 건강 운세",
+    "love": "올해의 연애 운세",
+    "business": "올해의 사업 운세",
+    "study": "올해의 공부 운세",
+    "advice": "올해의 조언 한마디"
+  },
+  "star_fortune": {
+    "overall": "이번달 별자리 운세의 전체적인 내용",
+    "wealth": "이번달 별자리의 금전 운세",
+    "health": "이번달 별자리의 건강 운세",
+    "love": "이번달 별자리의 연애 운세",
+    "business": "이번달 별자리의 사업 운세",
+    "study": "이번달 별자리의 공부 운세",
+    "advice": "이번달 별자리의 조언 한마디"
   }
 }`;
 }
