@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     
     if (body.birthDay < 1 || body.birthDay > 31) {
       return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생일입니다.' },
+        { success: false, error: '유효하지 않은 출생일자입니다.' },
         { status: 400 }
       );
     }

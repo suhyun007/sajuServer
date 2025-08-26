@@ -76,7 +76,7 @@ export default function Home() {
             </span>
           </h2>
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            사주 정보 + 오늘의 운세
+            출생 정보 + 오늘의 운세
           </p>
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
             OpenAI 기반 개인화된 운세

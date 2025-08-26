@@ -118,7 +118,7 @@ export default function TestPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  출생일
+                  출생일자
                 </label>
                 <input
                   type="number"
@@ -199,9 +199,9 @@ export default function TestPage() {
             
             {response.success ? (
               <div className="space-y-6">
-                {/* 사주 정보 */}
+                {/* 출생 정보 */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                  <h3 className="text-lg font-medium text-blue-800 mb-2">사주 정보</h3>
+                  <h3 className="text-lg font-medium text-blue-800 mb-2">출생 정보</h3>
                   <div className="text-center mb-4">
                     <div className="text-2xl font-bold text-blue-700 mb-2">{response.data?.saju}</div>
                     <p className="text-sm text-blue-600">사주 팔자</p>
