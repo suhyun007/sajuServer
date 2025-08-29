@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       const suggestions = data.suggestions || [];
       
       // 응답 형식을 Flutter에서 사용하기 쉽게 변환
-      const predictions = suggestions.map((suggestion: any) => {
+      const predictions = suggestions.map((suggestion: { placePrediction: { placeId: string; text: { text: string } } }) => {
         const placePrediction = suggestion.placePrediction;
         return {
           place_id: placePrediction.placeId,
