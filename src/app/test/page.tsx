@@ -34,6 +34,8 @@ export default function TestPage() {
     birthHour: 23,
     birthMinute: 30,
     gender: 'male',
+    location: '서울',
+    status: '기혼',
   });
 
   const [response, setResponse] = useState<SajuResponse | null>(null);
