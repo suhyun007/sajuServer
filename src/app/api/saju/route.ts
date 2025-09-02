@@ -12,7 +12,12 @@ export interface TodayFortune {
   wealth: string;
   health: string;
   love: string;
+  status: string;
   advice: string;
+  luckyItem: string;
+  score: number;
+  business: string;
+  study: string;
 }
 
 export interface SajuResponse {
@@ -24,6 +29,9 @@ export interface SajuResponse {
       month: string;
       day: string;
       hour: string;
+      status: string;
+      region: string;
+      gender: string;
     };
     today_fortune: TodayFortune;
   };
@@ -130,7 +138,7 @@ export async function POST(request: NextRequest) {
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     
     // 입력 검증
-    if (!body.birthYear || !body.birthMonth || !body.birthDay || !body.birthHour || !body.gender) {
+    if (!body.birthYear || !body.birthMonth || !body.birthDay || !body.birthHour || !body.gender || !body.location) {
       return NextResponse.json(
         { success: false, error: '필수 정보가 누락되었습니다.' },
         { status: 400 }

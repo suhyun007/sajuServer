@@ -7,7 +7,10 @@ const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyBwCKMIwdwgDXe
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { input } = body;
+    const { input, language } = body;
+
+    console.log('🌍 서버에서 받은 언어:', language);
+    console.log('🌍 서버에서 받은 검색어:', input);
 
     if (!input) {
       return NextResponse.json({ error: '검색어가 필요합니다.' }, { status: 400 });
@@ -24,7 +27,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         input: input,
-        languageCode: 'ko',
+        languageCode: language || 'en', // 클라이언트에서 받은 언어 사용, 기본값은 영어
       }),
     });
 
