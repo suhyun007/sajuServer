@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { generateFortunePrompt, getFortuneSystemPrompt, SajuRequest } from '@/lib/prompts/sajuFortune';
+import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest } from '@/lib/prompts/sajuEpisode';
 
 // OpenAI 클라이언트 초기화
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export interface SajuFortuneResponse {
+export interface EpisodeResponse {
   success: boolean;
   data?: {
-    love: string;
-    wealth: string;
-    health: string;
-    study: string;
-    overall: string;
+    title: string;
+    content: string;
+    contentLength: string;
+    summary: string;
+    tomorrowSummary: string;
   };
   error?: string;
 }
 
-// OpenAI API를 사용하여 가이드라인 생성
-async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneResponse['data']> {
+// OpenAI API를 사용하여 에피소드 생성
+async function generateEpisode(episodeData: EpisodeRequest): Promise<EpisodeResponse['data']> {
   try {
-    console.log('=== OpenAI API 호출 시작 (시) ===');
-    const prompt = generateFortunePrompt(fortuneData);
+    console.log('=== OpenAI API 호출 시작 (에피소드) ===');
+    const prompt = generateEpisodePrompt(episodeData);
     console.log('생성된 프롬프트:', prompt);
 
     const completion = await openai.chat.completions.create({
@@ -31,7 +31,7 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
       messages: [
         {
           role: "system",
-          content: getFortuneSystemPrompt(fortuneData.language)
+          content: getEpisodeSystemPrompt(episodeData.language)
         },
         {
           role: "user",
@@ -39,11 +39,10 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
         }
       ],
       temperature: 0.7,       // 창의성 vs 일관성 밸런스
-      max_tokens: 500,        // 500자 내외 요청 + JSON 마무리 공간 확보
+      max_tokens: 800,        // 500자 내외 요청 + JSON 마무리 공간 확보
       top_p: 1,               // (기본값, 그대로 두면 됨)
       frequency_penalty: 0,   // 반복 억제 (필요하면 조정)
       presence_penalty: 0,    // 새로운 주제 탐색 (필요 없으면 0)
-      response_format: { type: 'json_object' },
     });
 
     const responseText = completion.choices[0]?.message?.content || '';
@@ -58,13 +57,13 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
         console.log('파싱된 JSON:', JSON.stringify(parsed, null, 2));
         
         // 필수 필드 검증
-        if (parsed.love && parsed.wealth && parsed.health && parsed.study && parsed.overall) {
+        if (parsed.title && parsed.content) {
           return {
-            love: parsed.love,
-            wealth: parsed.wealth,
-            health: parsed.health,
-            study: parsed.study,
-            overall: parsed.overall,
+            title: parsed.title,
+            content: parsed.content,
+            contentLength: parsed.contentLength || '약 600자',
+            summary: parsed.summary || '에피소드 요약',
+            tomorrowSummary: parsed.tomorrowSummary || '내일 에피소드 미리보기',
           };
         } else {
           throw new Error('필수 필드가 누락되었습니다');
@@ -88,22 +87,21 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('=== 가이드 API 호출 시작 ===');
-    const body: SajuRequest = await request.json();
+    console.log('=== 에피소드 API 호출 시작 ===');
+    const body: EpisodeRequest = await request.json();
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     
-    // 필수 필드 검증
-    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
-    for (const field of requiredFields) {
-      const value = body[field as keyof SajuRequest];
-      console.log(`필드 ${field} 값:`, value, '타입:', typeof value);
-      if (value === undefined || value === null) {
-        console.log(`❌ 필수 필드 누락: ${field}`);
-        return NextResponse.json(
-          { success: false, error: `필수 정보가 누락되었습니다: ${field}` },
-          { status: 400 }
-        );
-      }
+    // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
+    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'genre', 'language'];
+    const missing = requiredFields.filter((key) => {
+      const v = (body as any)[key];
+      return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+    });
+    if (missing.length) {
+      return NextResponse.json(
+        { success: false, error: `필수 정보가 누락되었습니다: ${missing.join(',')}` },
+        { status: 400 }
+      );
     }
     
     // 입력값 검증
@@ -159,12 +157,12 @@ export async function POST(request: NextRequest) {
     
     // OpenAI를 통한 에피소드 생성
     console.log('OpenAI API 호출 시작...');
-    const fortuneData = await generateFortune(body);
-    console.log('OpenAI 응답 결과:', JSON.stringify(fortuneData, null, 2));
+    const episodeData = await generateEpisode(body);
+    console.log('OpenAI 응답 결과:', JSON.stringify(episodeData, null, 2));
     
     const responseData = {
       success: true,
-      data: fortuneData,
+      data: episodeData,
     };
     
     console.log('=== 최종 응답 ===');
@@ -174,7 +172,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(responseData);
     
   } catch (error) {
-    console.error('=== 오늘의 가이드라인 API 오류 발생 ===');
+    console.error('=== 에피소드 API 오류 발생 ===');
     console.error('오류 타입:', error?.constructor?.name || 'Unknown');
     console.error('오류 메시지:', String(error));
     console.error('오류 스택:', error instanceof Error ? error.stack : '스택 정보 없음');
@@ -193,9 +191,9 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     success: true,
-    message: '오늘의 가이드라인 API 서버가 정상적으로 작동 중입니다.',
+    message: '에피소드 API 서버가 정상적으로 작동 중입니다.',
     endpoints: {
-      POST: '/api/saju - 개인화된 오늘의 가이드라인 생성',
+      POST: '/api/episode - 개인화된 에피소드 생성',
     },
     note: 'OpenAI API 키가 필요합니다. 환경 변수 OPENAI_API_KEY를 설정해주세요.',
   });

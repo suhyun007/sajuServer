@@ -1,4 +1,4 @@
-export interface SajuRequest {
+export interface EpisodeRequest {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
@@ -12,8 +12,8 @@ export interface SajuRequest {
   language: 'ko' | 'en' | 'ja' | 'zh';
 }
 
-export function generateFortunePrompt(fortuneData: SajuRequest): string {
-  const { birthYear, birthMonth, birthDay, birthHour, birthMinute, gender, location, loveStatus, currentDate, genre, language } = fortuneData;
+export function generateEpisodePrompt(episodeData: EpisodeRequest): string {
+  const { birthYear, birthMonth, birthDay, birthHour, birthMinute, gender, location, loveStatus, currentDate, genre, language } = episodeData;
   
   const languageLabel =
     language === 'ko' ? 'Korean' :
@@ -27,10 +27,11 @@ User information:
 - Love status: ${loveStatus}
 - Current date: ${currentDate}
 - genre: ${genre}
-- write in ${languageLabel} format.`;  
+- write in ${languageLabel} format.`;
 }
 
-export function getFortuneSystemPrompt(language: string): string {
+// System 프롬프트 함수 (언어별 동적 생성)
+export function getEpisodeSystemPrompt(language: string): string {
   const languageLabel = 
     language === 'ko' ? 'Korean' :
     language === 'ja' ? 'Japanese' :
@@ -42,14 +43,13 @@ Guidelines:
 2. Create a warm, hopeful short story that reflects the energies and possible emotions of today (based on the current date).
 3. Focus on beauty and meaning in everyday life.
 4. Include subtle hints of destiny or guidance without being explicit.
-5. Each field must be written in ${languageLabel}, exactly 2 lines per item.
-6. The total is about 450 characters.
-7. Return only valid JSON in the following format:
+5. Around 700 characters in ${languageLabel}.
+6. Return only valid JSON in the following format:
 {
-  "love": "Love",
-  "wealth": "Wealth",
-  "health": "Health",
-  "study": "Study & Business",
-  "overall": "Overall"
+  "title": "Episode title",
+  "content": "Episode content",
+  "contentLength": responsedata length,
+  "summary": "One-line summary of this episode",
+  "tomorrowSummary": "One-line teaser for tomorrow's episode"
 }`;
 }
