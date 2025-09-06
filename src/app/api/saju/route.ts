@@ -99,7 +99,8 @@ export async function POST(request: NextRequest) {
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     
     // needDummy 파라미터 확인
-    const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    // const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    const needDummy = true;
     console.log('needDummy 파라미터:', needDummy);
     
     if (needDummy) {
