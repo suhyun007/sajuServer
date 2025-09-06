@@ -22,7 +22,9 @@ export interface EpisodeResponse {
 // OpenAI API를 사용하여 에피소드 생성
 async function generateEpisode(episodeData: EpisodeRequest): Promise<EpisodeResponse['data']> {
   try {
+    const startTime = new Date();
     console.log('=== OpenAI API 호출 시작 (에피소드) ===');
+    console.log('호출 시점:', startTime.toISOString());
     const prompt = generateEpisodePrompt(episodeData);
     console.log('생성된 프롬프트:', prompt);
 
@@ -45,6 +47,10 @@ async function generateEpisode(episodeData: EpisodeRequest): Promise<EpisodeResp
       presence_penalty: 0,    // 새로운 주제 탐색 (필요 없으면 0)
     });
 
+    const endTime = new Date();
+    const duration = endTime.getTime() - startTime.getTime();
+    console.log('OpenAI API 호출 완료 시점:', endTime.toISOString());
+    console.log('OpenAI API 호출 소요 시간:', duration + 'ms');
     const responseText = completion.choices[0]?.message?.content || '';
     console.log('OpenAI 원본 응답:', responseText);
     

@@ -22,7 +22,9 @@ export interface PoetryResponse {
 // OpenAI API를 사용하여 시 생성
 async function generatePoetry(poetryData: PoetryRequest): Promise<PoetryResponse['data']> {
   try {
+    const startTime = new Date();
     console.log('=== OpenAI API 호출 시작 (시) ===');
+    console.log('호출 시점:', startTime.toISOString());
     const prompt = generatePoetryPrompt(poetryData);
     console.log('생성된 프롬프트:', prompt);
 
@@ -46,6 +48,10 @@ async function generatePoetry(poetryData: PoetryRequest): Promise<PoetryResponse
       response_format: { type: 'json_object' },
     });
 
+    const endTime = new Date();
+    const duration = endTime.getTime() - startTime.getTime();
+    console.log('OpenAI API 호출 완료 시점:', endTime.toISOString());
+    console.log('OpenAI API 호출 소요 시간:', duration + 'ms');
     const responseText = completion.choices[0]?.message?.content || '';
     console.log('OpenAI 원본 응답:', responseText);
     

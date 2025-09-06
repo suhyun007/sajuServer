@@ -22,7 +22,9 @@ export interface SajuFortuneResponse {
 // OpenAI API를 사용하여 가이드라인 생성
 async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneResponse['data']> {
   try {
+    const startTime = new Date();
     console.log('=== OpenAI API 호출 시작 (시) ===');
+    console.log('호출 시점:', startTime.toISOString());
     const prompt = generateFortunePrompt(fortuneData);
     console.log('생성된 프롬프트:', prompt);
 
@@ -46,6 +48,10 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
       response_format: { type: 'json_object' },
     });
 
+    const endTime = new Date();
+    const duration = endTime.getTime() - startTime.getTime();
+    console.log('OpenAI API 호출 완료 시점:', endTime.toISOString());
+    console.log('OpenAI API 호출 소요 시간:', duration + 'ms');
     const responseText = completion.choices[0]?.message?.content || '';
     console.log('OpenAI 원본 응답:', responseText);
     
