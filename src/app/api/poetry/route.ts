@@ -92,6 +92,47 @@ export async function POST(request: NextRequest) {
     const body: PoetryRequest = await request.json();
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     
+    // needDummy 파라미터 확인
+    const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    console.log('needDummy 파라미터:', needDummy);
+
+    if (needDummy) {
+      console.log('더미 데이터 반환 모드');
+      console.log('언어:', body.language);
+      
+      let dummyData;
+      
+      if (body.language === 'en') {
+        // 영어 더미 데이터
+        dummyData = {
+          success: true,
+          data: {
+            "title": "Awaiting the Journey of Love",
+            "content": "The first breath of autumn,  \nturning the whole world into shades of gold.  \nDeep within my heart,  \nI quietly wish for the seed of love to sprout,  \nas I picture the scent of that person.  \n\nDays filled with longing,  \na heart unable to confess,  \ndreaming of moments together  \nbeneath the blue sky,  \nwhispering my wish to the stars above.  \n\nAt the end of this path,  \nfor the moment I meet you,  \nI ready my heart  \nand take one more step forward.  \n\nOn the day love finally arrives,  \nsmall blossoms blooming in my heart  \nwill become a bridge of hope  \nthat connects you and me.",
+            "contentLength": "400",
+            "summary": "A poem capturing the longing and hope for love.",
+            "tomorrowSummary": "Tomorrow speaks of the possibility of a new encounter.",
+            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+          }
+        };
+      }else{
+        dummyData = {
+          success: true,
+          data: {
+            "title": "사랑의 여정을 기다리며",
+            "content": "가을의 첫 숨결, \n온 세상이 황금빛으로 물들어가네.  \n내 마음의 깊은 곳,  \n사랑의 씨앗이 움트기를  \n조용히 바래며,  \n그 사람의 향기를 그려본다.  \n\n그리움의 나날,  \n고백할 수 없는 마음이,  \n파란 하늘 아래,  \n함께할 순간을 꿈꾸며  \n하늘의 별에 소원을 빌어본다.  \n\n이 길의 끝에,  \n마주칠 너를 위해,  \n내 마음의 준비를 다하고  \n한 걸음 더 나아간다.  \n\n사랑이 찾아오는 그 날,  \n내 마음에 피어나는  \n작은 꽃들이,  \n너와 나를 잇는  \n희망의 다리가 될 거야.",
+            "contentLength": "400",
+            "summary": "사랑의 기다림과 희망을 담은 시.",
+            "tomorrowSummary": "내일은 새로운 만남의 가능성을 이야기합니다.",
+            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+          }
+        };
+      }
+      console.log('더미 데이터 응답:', JSON.stringify(dummyData, null, 2));
+      return NextResponse.json(dummyData);
+
+    }
+
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
     const missing = requiredFields.filter((key) => {
@@ -163,7 +204,7 @@ export async function POST(request: NextRequest) {
     
     const responseData = {
       success: true,
-      data: poetryData,
+      data: { ...poetryData, servedDate: (body as any)?.currentDate || new Date().toISOString().slice(0,10) },
     };
     
     console.log('=== 최종 응답 ===');
