@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'genre', 'language'];
     const missing = requiredFields.filter((key) => {
-      const v = (body as any)[key];
+      const v = (body as unknown as Record<string, unknown>)[key];
       return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
     });
     if (missing.length) {
