@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       
       let dummyData;
       
-      if (body.language === 'en') {
+      if (body.language === 'ko') {
         // 영어 더미 데이터
         dummyData = {
           success: true,
