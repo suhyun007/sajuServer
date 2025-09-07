@@ -91,9 +91,8 @@ export async function POST(request: NextRequest) {
     console.log('=== 시 API 호출 시작 ===');
     const body: PoetryRequest = await request.json();
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
-    
-    // needDummy 파라미터 확인
-    // const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
+    console.log('servedDate:', servedDate);
     const needDummy = true;
     console.log('needDummy 파라미터:', needDummy);
 
@@ -103,20 +102,8 @@ export async function POST(request: NextRequest) {
       
       let dummyData;
       
-      if (body.language === 'en') {
+      if (body.language === 'ko') {
         // 영어 더미 데이터
-        dummyData = {
-          success: true,
-          data: {
-            "title": "Awaiting the Journey of Love",
-            "content": "The first breath of autumn,  \nturning the whole world into shades of gold.  \nDeep within my heart,  \nI quietly wish for the seed of love to sprout,  \nas I picture the scent of that person.  \n\nDays filled with longing,  \na heart unable to confess,  \ndreaming of moments together  \nbeneath the blue sky,  \nwhispering my wish to the stars above.  \n\nAt the end of this path,  \nfor the moment I meet you,  \nI ready my heart  \nand take one more step forward.  \n\nOn the day love finally arrives,  \nsmall blossoms blooming in my heart  \nwill become a bridge of hope  \nthat connects you and me.",
-            "contentLength": "400",
-            "summary": "A poem capturing the longing and hope for love.",
-            "tomorrowSummary": "Tomorrow speaks of the possibility of a new encounter.",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
-          }
-        };
-      }else{
         dummyData = {
           success: true,
           data: {
@@ -125,14 +112,28 @@ export async function POST(request: NextRequest) {
             "contentLength": "400",
             "summary": "사랑의 기다림과 희망을 담은 시.",
             "tomorrowSummary": "내일은 새로운 만남의 가능성을 이야기합니다.",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+            "servedDate": servedDate
+          }
+        };
+      }else{
+        dummyData = {
+          success: true,
+          data: {
+            "title": "Awaiting the Journey of Love",
+            "content": "The first breath of autumn,  \nturning the whole world into shades of gold.  \nDeep within my heart,  \nI quietly wish for the seed of love to sprout,  \nas I picture the scent of that person.  \n\nDays filled with longing,  \na heart unable to confess,  \ndreaming of moments together  \nbeneath the blue sky,  \nwhispering my wish to the stars above.  \n\nAt the end of this path,  \nfor the moment I meet you,  \nI ready my heart  \nand take one more step forward.  \n\nOn the day love finally arrives,  \nsmall blossoms blooming in my heart  \nwill become a bridge of hope  \nthat connects you and me.",
+            "contentLength": "400",
+            "summary": "A poem capturing the longing and hope for love.",
+            "tomorrowSummary": "Tomorrow speaks of the possibility of a new encounter.",
+            "servedDate": servedDate
           }
         };
       }
       console.log('더미 데이터 응답:', JSON.stringify(dummyData, null, 2));
       return NextResponse.json(dummyData);
-
     }
+
+    // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
+    console.log('실제 OpenAI API 호출 모드');
 
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
@@ -205,7 +206,7 @@ export async function POST(request: NextRequest) {
     
     const responseData = {
       success: true,
-      data: { ...poetryData, servedDate: (body as any)?.currentDate || new Date().toISOString().slice(0,10) },
+      data: { ...poetryData, servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10) },
     };
     
     console.log('=== 최종 응답 ===');

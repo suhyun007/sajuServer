@@ -96,11 +96,9 @@ export async function POST(request: NextRequest) {
     console.log('=== 에피소드 API 호출 시작 ===');
     const body: EpisodeRequest = await request.json();
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
-
-    // needDummy 파라미터 확인
-    // const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
+    console.log('servedDate:', servedDate);
     const needDummy = true;
-
     console.log('needDummy 파라미터:', needDummy);
 
     if (needDummy) {
@@ -114,32 +112,35 @@ export async function POST(request: NextRequest) {
         dummyData = {
           success: true,
           data: {
-            "title": "A Fateful Encounter",
-            "content": "On a bright morning in a small village café, a woman sipped her coffee while gazing out the window. At that moment, her eyes met those of a man. He was reading a book, and his gaze seemed to hold a world of untold stories. The woman felt as though their conversation was meant to be. As they spoke about their tastes and interests, the walls around their hearts began to fade. Realizing that today was a special day to meet someone new, the woman smiled warmly.",
-            "contentLength": "416",
-            "summary": "A story about discovering a new connection through a fateful meeting.",
-            "tomorrowSummary": "Tomorrow reveals how yesterday’s encounter blossoms into a new adventure.",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
-          }      
-        };
-      }else{
-        dummyData = {
-          success: true,
-          data: {
             "title": "운명의 만남",
             "content": "어느 화창한 아침, 작은 마을의 한 카페에서 한 여인이 커피를 마시며 창밖을 바라보고 있었다. 그 순간, 그녀의 시선이 한 남자와 마주쳤다. 남자는 책을 읽고 있었고, 그의 눈빛은 깊은 이야기를 담고 있었다. 여인은 그와의 대화가 운명처럼 느껴졌다. 서로의 취향에 대해 이야기하며, 두 사람은 마음의 벽을 허물기 시작했다. 오늘은 새로운 인연을 만날 수 있는 특별한 날임을 느끼며, 여인은 웃음을 지었다.",
             "contentLength": "416",
             "summary": "운명적인 만남을 통해 새로운 인연을 발견하는 이야기입니다.",
             "tomorrowSummary": "어제의 만남이 새로운 모험으로 이어지는 이야기를 들려드립니다.",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
-          }        
+            "servedDate": servedDate
+          }    
+        };
+      }else{
+        dummyData = {
+          success: true,
+          data: {
+            "title": "A Fateful Encounter",
+            "content": "On a bright morning in a small village café, a woman sipped her coffee while gazing out the window. At that moment, her eyes met those of a man. He was reading a book, and his gaze seemed to hold a world of untold stories. The woman felt as though their conversation was meant to be. As they spoke about their tastes and interests, the walls around their hearts began to fade. Realizing that today was a special day to meet someone new, the woman smiled warmly.",
+            "contentLength": "416",
+            "summary": "A story about discovering a new connection through a fateful meeting.",
+            "tomorrowSummary": "Tomorrow reveals how yesterday’s encounter blossoms into a new adventure.",
+            "servedDate": servedDate
+          }          
         };
       } 
 
       console.log('더미 데이터 응답:', JSON.stringify(dummyData, null, 2));
       return NextResponse.json(dummyData);
-    }  
+    }
 
+    // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
+    console.log('실제 OpenAI API 호출 모드');
+    
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'genre', 'language'];
     const missing = requiredFields.filter((key) => {
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
     
     const responseData = {
       success: true,
-      data: { ...episodeData, servedDate: (body as any)?.currentDate || new Date().toISOString().slice(0,10) },
+      data: { ...episodeData, servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10) },
     };
     
     console.log('=== 최종 응답 ===');

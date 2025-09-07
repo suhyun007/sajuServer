@@ -97,9 +97,8 @@ export async function POST(request: NextRequest) {
     console.log('=== 가이드 API 호출 시작 ===');
     const body: SajuRequest = await request.json();
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
-    
-    // needDummy 파라미터 확인
-    // const needDummy = (body as unknown as Record<string, unknown>)['needDummy'] === true;
+    const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
+    console.log('servedDate:', servedDate);
     const needDummy = true;
     console.log('needDummy 파라미터:', needDummy);
     
@@ -119,7 +118,7 @@ export async function POST(request: NextRequest) {
             "health": "Stay hydrated and get enough rest. A short walk or light exercise can boost your energy.",
             "study": "Focus on one task at a time. Break down complex topics into smaller, manageable parts.",
             "overall": "Start your day with a positive mindset. Small steps toward your goals can make a big difference.",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+            "servedDate": servedDate
           }
         };
       } else if (body.language === 'ja') {
@@ -132,7 +131,7 @@ export async function POST(request: NextRequest) {
             "health": "水分補給を忘れず、十分な休息を取りましょう。短い散歩や軽い運動で気分が良くなります。",
             "study": "一度に一つのことに集中しましょう。複雑な内容も小さな部分に分けて取り組むと理解しやすくなります。",
             "overall": "前向きな気持ちで一日を始めましょう。目標に向けた小さな一歩が大きな変化をもたらします。",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+            "servedDate": servedDate
           }
         };
       } else if (body.language === 'zh') {
@@ -145,7 +144,7 @@ export async function POST(request: NextRequest) {
             "health": "保持充足的水分摄入和休息。短距离散步或轻度运动可以提升你的精力。",
             "study": "一次专注于一个任务。将复杂的话题分解成更小、更容易管理的部分。",
             "overall": "以积极的心态开始新的一天。朝着目标的小步骤可以带来很大的改变。",
-            "servedDate": (body as any)?.currentDate || new Date().toISOString().slice(0,10)
+            "servedDate": servedDate
           }
         };
       } else {
@@ -158,7 +157,7 @@ export async function POST(request: NextRequest) {
             "health": "오늘은 몸과 마음이 균형을 이루는 날입니다. 자신을 돌보는 시간을 가지세요.",
             "study": "새로운 배움이 여러분을 기다리고 있습니다. 호기심을 가지고 도전해보세요.",
             "overall": "오늘은 새로운 시작의 기운을 느낄 수 있습니다. 긍정적인 마음으로 하루를 맞이하세요.",
-            "servedDate": new Date().toISOString().slice(0,10)
+            "servedDate": servedDate
           }
         };
       }
@@ -166,6 +165,9 @@ export async function POST(request: NextRequest) {
       console.log('더미 데이터 응답:', JSON.stringify(dummyData, null, 2));
       return NextResponse.json(dummyData);
     }
+
+    // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
+    console.log('실제 OpenAI API 호출 모드');
     
     // 필수 필드 검증
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
@@ -239,7 +241,7 @@ export async function POST(request: NextRequest) {
     
     const responseData = {
       success: true,
-      data: { ...fortuneData, servedDate: (body as any)?.currentDate || new Date().toISOString().slice(0,10) },
+      data: { ...fortuneData, servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10) },
     };
     
     console.log('=== 최종 응답 ===');
