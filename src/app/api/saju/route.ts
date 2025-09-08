@@ -41,7 +41,7 @@ async function generateFortune(fortuneData: SajuRequest): Promise<SajuFortuneRes
         }
       ],
       temperature: 0.7,       // 창의성 vs 일관성 밸런스
-      max_tokens: 500,        // 500자 내외 요청 + JSON 마무리 공간 확보
+      max_tokens: 400,        // 500자 내외 요청 + JSON 마무리 공간 확보
       top_p: 1,               // (기본값, 그대로 두면 됨)
       frequency_penalty: 0,   // 반복 억제 (필요하면 조정)
       presence_penalty: 0,    // 새로운 주제 탐색 (필요 없으면 0)
@@ -100,9 +100,13 @@ export async function POST(request: NextRequest) {
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
     const needDummy = true;
-    console.log('needDummy 파라미터:', needDummy);
-    
-    if (needDummy) {
+    const hostHeader = request.headers.get('host') || '';
+    const hostname = request.nextUrl.hostname || '';
+    const localHosts = ['localhost', '127.0.0.1', '::1', '10.0.2.2'];
+    const isLocalHost = localHosts.includes(hostname) || localHosts.some(h => hostHeader.startsWith(h));
+    console.log({ needDummy, hostHeader, hostname, isLocalHost });
+
+    if (needDummy && isLocalHost) {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       

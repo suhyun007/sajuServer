@@ -43,7 +43,7 @@ Guidelines:
 2. Create a warm, hopeful short story that reflects the energies and possible emotions of today (based on the current date).
 3. Focus on beauty and meaning in everyday life.
 4. Include subtle hints of destiny or guidance without being explicit.
-5. Around 700 characters in ${languageLabel}.
+5. Around 500 characters in ${languageLabel}.
 6. Return only valid JSON in the following format:
 {
   "title": "Episode title",

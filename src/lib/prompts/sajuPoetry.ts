@@ -44,7 +44,7 @@ export function getPoetrySystemPrompt(language: string): string {
     2. Write a warm, emotional, and deeply touching poem that captures today's feelings (based on the current date).
     3. Use beautiful, evocative expressions that resonate with the reader's heart.
     4. Structure the poem in 4–6 stanzas, free verse style.
-    5. Around 600 characters in ${languageLabel}.
+    5. Around 400 characters in ${languageLabel}.
     6. Include both a title and the full poem text.
     7. Consider rhythm and flow for a lyrical tone.
     8. Return only valid JSON in the following format:
