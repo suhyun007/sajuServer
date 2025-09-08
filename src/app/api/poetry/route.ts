@@ -41,7 +41,7 @@ async function generatePoetry(poetryData: PoetryRequest): Promise<PoetryResponse
         }
       ],
       temperature: 0.7,       // 창의성 vs 일관성 밸런스
-      max_tokens: 650,        // 500자 내외 요청 + JSON 마무리 공간 확보
+      max_tokens: 400,        // 500자 내외 요청 + JSON 마무리 공간 확보
       top_p: 1,               // (기본값, 그대로 두면 됨)
       frequency_penalty: 0,   // 반복 억제 (필요하면 조정)
       presence_penalty: 0,    // 새로운 주제 탐색 (필요 없으면 0)

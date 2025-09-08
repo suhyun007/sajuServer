@@ -43,7 +43,7 @@ Guidelines:
 3. Focus on beauty and meaning in everyday life.
 4. Include subtle hints of destiny or guidance without being explicit.
 5. Each field must be written in ${languageLabel}, exactly 2 lines per item.
-6. The total is about 450 characters.
+6. The total is about 400 characters.
 7. Return only valid JSON in the following format:
 {
   "love": "Love",
