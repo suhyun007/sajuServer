@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { generatePoetryPrompt, getPoetrySystemPrompt, PoetryRequest } from '@/lib/prompts/sajuPoetry';
 
-// OpenAI 클라이언트 초기화
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// OpenAI 클라이언트 초기화 (키가 있을 때만)
+let openai: OpenAI | null = null;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export interface PoetryResponse {
   success: boolean;
@@ -27,6 +30,10 @@ async function generatePoetry(poetryData: PoetryRequest): Promise<PoetryResponse
     console.log('호출 시점:', startTime.toISOString());
     const prompt = generatePoetryPrompt(poetryData);
     console.log('생성된 프롬프트:', prompt);
+
+    if (!openai) {
+      throw new Error('OpenAI API 키가 설정되지 않았습니다.');
+    }
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
