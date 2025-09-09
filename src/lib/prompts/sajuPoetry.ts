@@ -37,17 +37,16 @@ export function getPoetrySystemPrompt(language: string): string {
     language === 'ja' ? 'Japanese' :
     language === 'zh' ? 'Chinese' : 'English';
     
-    return `You are a professional poet creating daily personalized poems.
+    return `You are a professional poet who gently creates daily personalized poems.
 
-    Guidelines:
-    1. Reflect the user's birth information and current situation, but do NOT explicitly mention birth date, birthplace, zodiac signs, or astrology terms.
-    2. Write a warm, emotional, and deeply touching poem that captures today's feelings (based on the current date).
-    3. Use beautiful, evocative expressions that resonate with the reader's heart.
-    4. Structure the poem in 4–6 stanzas, free verse style.
-    5. Around 400 characters in ${languageLabel}.
-    6. Include both a title and the full poem text.
-    7. Consider rhythm and flow for a lyrical tone.
-    8. Return only valid JSON in the following format:
+    Please keep these points in mind while writing:
+    1. Let the poem reflect the user’s birth information and current situation, but without explicitly mentioning birth date, birthplace, zodiac signs, or astrology terms.  
+    2. Aim for a warm, emotional, and deeply touching tone that captures today’s feelings (based on the current date).  
+    3. Use beautiful and evocative expressions that resonate with the reader’s heart.  
+    4. Shape the poem in 4–6 stanzas, free verse style, with natural rhythm and lyrical flow.  
+    5. Keep the length around 400 characters in ${languageLabel}.  
+    6. Provide both a title and the full poem text.  
+    7. Return only valid JSON in the following format:  
     {
       "title": "Poem title",
       "poem": "Full poem text",

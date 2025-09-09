@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest } from '@/lib/prompts/sajuEpisode';
 
-// OpenAI 클라이언트 초기화
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// OpenAI 클라이언트 초기화 (더미 데이터 사용 시에는 초기화하지 않음)
+let openai: OpenAI | null = null;
+
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export interface EpisodeResponse {
   success: boolean;
@@ -28,6 +32,10 @@ async function generateEpisode(episodeData: EpisodeRequest): Promise<EpisodeResp
     const prompt = generateEpisodePrompt(episodeData);
     console.log('생성된 프롬프트:', prompt);
 
+    if (!openai) {
+      throw new Error('OpenAI API 키가 설정되지 않았습니다.');
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -41,7 +49,7 @@ async function generateEpisode(episodeData: EpisodeRequest): Promise<EpisodeResp
         }
       ],
       temperature: 0.7,       // 창의성 vs 일관성 밸런스
-      max_tokens: 600,        // 500자 내외 요청 + JSON 마무리 공간 확보
+      max_tokens: 700,        // 500자 내외 요청 + JSON 마무리 공간 확보
       top_p: 1,               // (기본값, 그대로 두면 됨)
       frequency_penalty: 0,   // 반복 억제 (필요하면 조정)
       presence_penalty: 0,    // 새로운 주제 탐색 (필요 없으면 0)
@@ -98,6 +106,20 @@ export async function POST(request: NextRequest) {
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
+
+    // OS 종류 확인
+    const userAgent = request.headers.get('user-agent') || '';
+    const customOSHeader = request.headers.get('x-client-os') || '';
+    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iPod') || customOSHeader.toLowerCase() === 'ios';
+    const isAndroid = userAgent.includes('Android') || customOSHeader.toLowerCase() === 'android';
+    const osType = isIOS ? 'iOS' : isAndroid ? 'Android' : 'Unknown';
+    
+    console.log('User-Agent:', userAgent);
+    console.log('Custom OS Header:', customOSHeader);
+    console.log('OS Type:', osType);
+    console.log('isIOS:', isIOS);
+    console.log('isAndroid:', isAndroid);
+
     const needDummy = true;
     const hostHeader = request.headers.get('host') || '';
     const hostname = request.nextUrl.hostname || '';
@@ -105,7 +127,18 @@ export async function POST(request: NextRequest) {
     const isLocalHost = localHosts.includes(hostname) || localHosts.some(h => hostHeader.startsWith(h));
     console.log({ needDummy, hostHeader, hostname, isLocalHost });
 
-    if (needDummy && isLocalHost) {
+    // OS별 조건부 처리 예시
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 요청됨');
+      // iOS 특화 로직이나 데이터 처리
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 요청됨');
+      // Android 특화 로직이나 데이터 처리
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
+    }
+
+    if ((needDummy && isLocalHost) || osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       
@@ -121,7 +154,8 @@ export async function POST(request: NextRequest) {
             "contentLength": "416",
             "summary": "운명적인 만남을 통해 새로운 인연을 발견하는 이야기입니다.",
             "tomorrowSummary": "어제의 만남이 새로운 모험으로 이어지는 이야기를 들려드립니다.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }    
         };
       }else{
@@ -133,7 +167,8 @@ export async function POST(request: NextRequest) {
             "contentLength": "416",
             "summary": "A story about discovering a new connection through a fateful meeting.",
             "tomorrowSummary": "Tomorrow reveals how yesterday’s encounter blossoms into a new adventure.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }          
         };
       } 
@@ -144,6 +179,18 @@ export async function POST(request: NextRequest) {
 
     // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
     console.log('실제 OpenAI API 호출 모드');
+    console.log('OS 타입:', osType);
+    
+    // OS별 조건부 처리
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 실제 API 요청됨');
+      // iOS 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 실제 API 요청됨');
+      // Android 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
+    }
     
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'genre', 'language'];

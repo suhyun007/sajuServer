@@ -93,6 +93,20 @@ export async function POST(request: NextRequest) {
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
+    
+    // OS 종류 확인
+    const userAgent = request.headers.get('user-agent') || '';
+    const customOSHeader = request.headers.get('x-client-os') || '';
+    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iPod') || customOSHeader.toLowerCase() === 'ios';
+    const isAndroid = userAgent.includes('Android') || customOSHeader.toLowerCase() === 'android';
+    const osType = isIOS ? 'iOS' : isAndroid ? 'Android' : 'Unknown';
+    
+    console.log('User-Agent:', userAgent);
+    console.log('Custom OS Header:', customOSHeader);
+    console.log('OS Type:', osType);
+    console.log('isIOS:', isIOS);
+    console.log('isAndroid:', isAndroid);
+    
     const needDummy = true;
     const hostHeader = request.headers.get('host') || '';
     const hostname = request.nextUrl.hostname || '';
@@ -100,14 +114,26 @@ export async function POST(request: NextRequest) {
     const isLocalHost = localHosts.includes(hostname) || localHosts.some(h => hostHeader.startsWith(h));
     console.log({ needDummy, hostHeader, hostname, isLocalHost });
 
-    if (needDummy && isLocalHost) {
+    // OS별 조건부 처리 예시
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 요청됨');
+      // iOS 특화 로직이나 데이터 처리
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 요청됨');
+      // Android 특화 로직이나 데이터 처리
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
+    }
+
+    if ((needDummy && isLocalHost) || osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
+      console.log('OS 타입:', osType);
       
       let dummyData;
       
       if (body.language === 'ko') {
-        // 영어 더미 데이터
+        // 한국어 더미 데이터
         dummyData = {
           success: true,
           data: {
@@ -116,10 +142,12 @@ export async function POST(request: NextRequest) {
             "contentLength": "400",
             "summary": "사랑의 기다림과 희망을 담은 시.",
             "tomorrowSummary": "내일은 새로운 만남의 가능성을 이야기합니다.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       }else{
+        // 영어 더미 데이터
         dummyData = {
           success: true,
           data: {
@@ -128,7 +156,8 @@ export async function POST(request: NextRequest) {
             "contentLength": "400",
             "summary": "A poem capturing the longing and hope for love.",
             "tomorrowSummary": "Tomorrow speaks of the possibility of a new encounter.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       }
@@ -138,6 +167,18 @@ export async function POST(request: NextRequest) {
 
     // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
     console.log('실제 OpenAI API 호출 모드');
+    console.log('OS 타입:', osType);
+    
+    // OS별 조건부 처리
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 실제 API 요청됨');
+      // iOS 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 실제 API 요청됨');
+      // Android 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
+    }
 
     // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
@@ -210,7 +251,11 @@ export async function POST(request: NextRequest) {
     
     const responseData = {
       success: true,
-      data: { ...poetryData, servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10) },
+      data: { 
+        ...poetryData, 
+        servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10),
+        osType: osType  // OS 정보를 응답에 포함
+      },
     };
     
     console.log('=== 최종 응답 ===');

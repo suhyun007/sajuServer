@@ -99,6 +99,20 @@ export async function POST(request: NextRequest) {
     console.log('요청 데이터:', JSON.stringify(body, null, 2));
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
+
+    // OS 종류 확인
+    const userAgent = request.headers.get('user-agent') || '';
+    const customOSHeader = request.headers.get('x-client-os') || '';
+    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iPod') || customOSHeader.toLowerCase() === 'ios';
+    const isAndroid = userAgent.includes('Android') || customOSHeader.toLowerCase() === 'android';
+    const osType = isIOS ? 'iOS' : isAndroid ? 'Android' : 'Unknown';
+    
+    console.log('User-Agent:', userAgent);
+    console.log('Custom OS Header:', customOSHeader);
+    console.log('OS Type:', osType);
+    console.log('isIOS:', isIOS);
+    console.log('isAndroid:', isAndroid);
+
     const needDummy = true;
     const hostHeader = request.headers.get('host') || '';
     const hostname = request.nextUrl.hostname || '';
@@ -106,7 +120,18 @@ export async function POST(request: NextRequest) {
     const isLocalHost = localHosts.includes(hostname) || localHosts.some(h => hostHeader.startsWith(h));
     console.log({ needDummy, hostHeader, hostname, isLocalHost });
 
-    if (needDummy && isLocalHost) {
+    // OS별 조건부 처리 예시
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 요청됨');
+      // iOS 특화 로직이나 데이터 처리
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 요청됨');
+      // Android 특화 로직이나 데이터 처리
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
+    }
+
+    if ((needDummy && isLocalHost) || osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       
@@ -122,7 +147,8 @@ export async function POST(request: NextRequest) {
             "health": "Stay hydrated and get enough rest. A short walk or light exercise can boost your energy.",
             "study": "Focus on one task at a time. Break down complex topics into smaller, manageable parts.",
             "overall": "Start your day with a positive mindset. Small steps toward your goals can make a big difference.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       } else if (body.language === 'ja') {
@@ -135,7 +161,8 @@ export async function POST(request: NextRequest) {
             "health": "水分補給を忘れず、十分な休息を取りましょう。短い散歩や軽い運動で気分が良くなります。",
             "study": "一度に一つのことに集中しましょう。複雑な内容も小さな部分に分けて取り組むと理解しやすくなります。",
             "overall": "前向きな気持ちで一日を始めましょう。目標に向けた小さな一歩が大きな変化をもたらします。",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       } else if (body.language === 'zh') {
@@ -148,7 +175,8 @@ export async function POST(request: NextRequest) {
             "health": "保持充足的水分摄入和休息。短距离散步或轻度运动可以提升你的精力。",
             "study": "一次专注于一个任务。将复杂的话题分解成更小、更容易管理的部分。",
             "overall": "以积极的心态开始新的一天。朝着目标的小步骤可以带来很大的改变。",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       } else {
@@ -161,7 +189,8 @@ export async function POST(request: NextRequest) {
             "health": "오늘은 몸과 마음이 균형을 이루는 날입니다. 자신을 돌보는 시간을 가지세요.",
             "study": "새로운 배움이 여러분을 기다리고 있습니다. 호기심을 가지고 도전해보세요.",
             "overall": "오늘은 새로운 시작의 기운을 느낄 수 있습니다. 긍정적인 마음으로 하루를 맞이하세요.",
-            "servedDate": servedDate
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
           }
         };
       }
@@ -172,6 +201,21 @@ export async function POST(request: NextRequest) {
 
     // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
     console.log('실제 OpenAI API 호출 모드');
+    
+    // 더미 데이터가 아닌 경우에만 실제 API 로직 실행
+    console.log('실제 OpenAI API 호출 모드');
+    console.log('OS 타입:', osType);
+    
+    // OS별 조건부 처리
+    if (isIOS) {
+      console.log('iOS 클라이언트에서 실제 API 요청됨');
+      // iOS 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else if (isAndroid) {
+      console.log('Android 클라이언트에서 실제 API 요청됨');
+      // Android 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
+    } else {
+      console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
+    }
     
     // 필수 필드 검증
     const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
