@@ -74,6 +74,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const guestId = searchParams.get('guestId');
     const userId = searchParams.get('userId');
+    const existsOnly = searchParams.get('existsOnly');
+
+    // existsOnly 모드: 데이터 반환 없이 count로 존재 여부만 확인
+    if (existsOnly && guestId) {
+      const { count, error } = await supabaseAdmin
+        .from('user_visit_logs')
+        .select('id', { count: 'exact', head: true })
+        .eq('guest_id', guestId);
+
+      if (error) {
+        console.error('방문 로그 존재 여부 조회 오류:', error);
+        return NextResponse.json({ success: false, error: 'exists check failed', details: error.message });
+      }
+
+      return NextResponse.json({ success: true, exists: (count ?? 0) > 0, count: count ?? 0 });
+    }
 
     let query = supabaseAdmin
       .from('user_visit_logs')
