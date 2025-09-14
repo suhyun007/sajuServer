@@ -132,8 +132,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    //if ((needDummy && isLocalHost) || osType =='Android') {
-    if (osType =='Android') {
+    if (needDummy || osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       console.log('OS 타입:', osType);
@@ -187,7 +186,7 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
     }
-
+    
     // OpenAI API 키 확인
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(

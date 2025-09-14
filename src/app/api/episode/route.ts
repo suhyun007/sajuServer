@@ -138,8 +138,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    //if ((needDummy && isLocalHost) || osType =='Android') {
-    if (osType =='Android') {
+    if (needDummy || osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       
