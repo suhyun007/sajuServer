@@ -132,7 +132,8 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if ((needDummy && isLocalHost) || osType =='Android') {
+    //if ((needDummy && isLocalHost) || osType =='Android') {
+    if (osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       console.log('OS 타입:', osType);
@@ -185,62 +186,6 @@ export async function POST(request: NextRequest) {
       // Android 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
     } else {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
-    }
-
-    // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
-    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
-    const missing = requiredFields.filter((key) => {
-      const v = (body as unknown as Record<string, unknown>)[key];
-      return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
-    });
-    if (missing.length) {
-      return NextResponse.json(
-        { success: false, error: `필수 정보가 누락되었습니다: ${missing.join(',')}` },
-        { status: 400 }
-      );
-    }
-    
-    // 입력값 검증
-    if (body.birthYear < 1900 || body.birthYear > 2100) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생년도입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthMonth < 1 || body.birthMonth > 12) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생월입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthDay < 1 || body.birthDay > 31) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생일자입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthHour < 0 || body.birthHour > 23) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생시간입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthMinute < 0 || body.birthMinute > 59) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생분입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (!['female', 'male', 'nonBinary'].includes(body.gender)) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 성별입니다.' },
-        { status: 400 }
-      );
     }
 
     // OpenAI API 키 확인

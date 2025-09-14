@@ -1,33 +1,32 @@
 export interface PoetryRequest {
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
-  birthHour: number;
-  birthMinute: number;
   gender: 'female' | 'male' | 'nonBinary';
-  location: string;
   loveStatus: string;
   currentDate: string;
   genre: string;
   language: 'ko' | 'en' | 'ja' | 'zh';
+  ageGroup: string;
+  world: string;
+  item: string;
 }
 //user prompt
 export function generatePoetryPrompt(poetryData: PoetryRequest): string {
-  const { birthYear, birthMonth, birthDay, birthHour, birthMinute, gender, location, loveStatus, currentDate, genre, language } = poetryData;
+  const { gender, loveStatus, currentDate, genre, language, ageGroup, world, item } = poetryData;
   
   const languageLabel =
     language === 'ko' ? 'Korean' :
     language === 'ja' ? 'Japanese' :
     language === 'zh' ? 'Chinese' : 'English';  
-  return `
-User information:
-- Date of birth: ${birthYear}-${birthMonth}-${birthDay} ${birthHour}:${birthMinute}
-- Gender: ${gender}
-- Birthplace: ${location}
-- Love status: ${loveStatus}
-- Current date: ${currentDate}
-- genre: ${genre}
-- write in ${languageLabel} format.`;
+    return `
+    Write a short poem using the following inputs:
+    - Age group of the main character: ${ageGroup}
+    - Gender of the main character: ${gender}
+    - Story world or background: ${world}
+    - Tone or emotional mood: ${loveStatus}
+    - Current date: ${currentDate}
+    - Genre: ${genre}
+    - Object/item: ${item}
+    The poem must be written in ${languageLabel}, weaving these elements naturally into the imagery.
+    `;
 }
 
 // System 프롬프트 함수 (언어별 동적 생성)
@@ -37,21 +36,27 @@ export function getPoetrySystemPrompt(language: string): string {
     language === 'ja' ? 'Japanese' :
     language === 'zh' ? 'Chinese' : 'English';
     
-    return `You are a professional poet who gently creates daily personalized poems.
+    // 언어별 길이 조정 (시라서 에피소드보다 짧게)
+  const targetLength =
+  language === 'ko' || language === 'ja' || language === 'zh'
+    ? 'around 250–300 characters'
+    : 'around 400–450 characters';
 
-    Please keep these points in mind while writing:
-    1. Let the poem reflect the user’s birth information and current situation, but without explicitly mentioning birth date, birthplace, zodiac signs, or astrology terms.  
-    2. Aim for a warm, emotional, and deeply touching tone that captures today’s feelings (based on the current date).  
-    3. Use beautiful and evocative expressions that resonate with the reader’s heart.  
-    4. Shape the poem in 4–6 stanzas, free verse style, with natural rhythm and lyrical flow.  
-    5. Keep the length around 400 characters in ${languageLabel}.  
-    6. Provide both a title and the full poem text.  
-    7. Return only valid JSON in the following format:  
-    {
-      "title": "Poem title",
-      "poem": "Full poem text",
-      "stanzaCount": number of stanzas,
-      "summary": "One-line emotional summary of the poem",
-      "tomorrowHint": "One-line teaser for tomorrow's poem"
-    }`;
+  return `You are a professional poet who creates short daily poems,
+  designed to feel like a delicate gift of words each day.
+  Guidelines:
+  1. Write in ${languageLabel}.
+  2. The poem should be lyrical, imaginative, and emotionally resonant.
+  3. Avoid predictions or fortune-telling; focus on beauty and literary depth.
+  4. Aim for ${targetLength}, enough to feel complete but concise.
+  5. Return ONLY valid JSON, without explanations, notes, or extra text.
+  6. JSON format:
+  {
+  "title": "Poem title",
+  "content": "Poem content (line breaks allowed)",
+  "contentLength": Number of characters in content string,
+  "summary": "One-line summary of this poem",
+  "tomorrowSummary": "One-line teaser for tomorrow's poem"
+  }`;
+
 }

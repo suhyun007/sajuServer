@@ -138,40 +138,42 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if ((needDummy && isLocalHost) || osType =='Android') {
+    //if ((needDummy && isLocalHost) || osType =='Android') {
+    if (osType =='Android') {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       
       let dummyData;
       
       if (body.language === 'ko') {
+        // 한국어 더미 데이터
+        dummyData = {
+          success: true,
+          data: {
+            title: "운명의 만남",
+            content: "어느 화창한 아침, 작은 마을의 한 카페에서 한 여인이 커피를 마시며 창밖을 바라보고 있었다. 그 순간, 그녀의 시선이 한 남자와 마주쳤다. 남자는 책을 읽고 있었고, 그의 눈빛은 깊은 이야기를 담고 있었다. 여인은 그와의 대화가 운명처럼 느껴졌다. 서로의 취향에 대해 이야기하며, 두 사람은 마음의 벽을 허물기 시작했다. 오늘은 새로운 인연을 만날 수 있는 특별한 날임을 느끼며, 여인은 웃음을 지었다.",
+            contentLength: "416",
+            summary: "운명적인 만남을 통해 새로운 인연을 발견하는 이야기입니다.",
+            tomorrowSummary: "어제의 만남이 새로운 모험으로 이어지는 이야기를 들려드립니다.",
+            servedDate: servedDate,
+            osType: osType  // OS 정보를 응답에 포함
+          }
+        };
+      } else {
         // 영어 더미 데이터
         dummyData = {
           success: true,
           data: {
-            "title": "운명의 만남",
-            "content": "어느 화창한 아침, 작은 마을의 한 카페에서 한 여인이 커피를 마시며 창밖을 바라보고 있었다. 그 순간, 그녀의 시선이 한 남자와 마주쳤다. 남자는 책을 읽고 있었고, 그의 눈빛은 깊은 이야기를 담고 있었다. 여인은 그와의 대화가 운명처럼 느껴졌다. 서로의 취향에 대해 이야기하며, 두 사람은 마음의 벽을 허물기 시작했다. 오늘은 새로운 인연을 만날 수 있는 특별한 날임을 느끼며, 여인은 웃음을 지었다.",
-            "contentLength": "416",
-            "summary": "운명적인 만남을 통해 새로운 인연을 발견하는 이야기입니다.",
-            "tomorrowSummary": "어제의 만남이 새로운 모험으로 이어지는 이야기를 들려드립니다.",
-            "servedDate": servedDate,
-            "osType": osType  // OS 정보를 응답에 포함
-          }    
+            title: "A Fateful Encounter",
+            content: "On a bright morning in a small village café, a woman sipped her coffee while gazing out the window. At that moment, her eyes met those of a man. He was reading a book, and his gaze seemed to hold a world of untold stories. The woman felt as though their conversation was meant to be. As they spoke about their tastes and interests, the walls around their hearts began to fade. Realizing that today was a special day to meet someone new, the woman smiled warmly.",
+            contentLength: "416",
+            summary: "A story about discovering a new connection through a fateful meeting.",
+            tomorrowSummary: "Tomorrow reveals how yesterday’s encounter blossoms into a new adventure.",
+            servedDate: servedDate,
+            osType: osType  // OS 정보를 응답에 포함
+          }
         };
-      }else{
-        dummyData = {
-          success: true,
-          data: {
-            "title": "A Fateful Encounter",
-            "content": "On a bright morning in a small village café, a woman sipped her coffee while gazing out the window. At that moment, her eyes met those of a man. He was reading a book, and his gaze seemed to hold a world of untold stories. The woman felt as though their conversation was meant to be. As they spoke about their tastes and interests, the walls around their hearts began to fade. Realizing that today was a special day to meet someone new, the woman smiled warmly.",
-            "contentLength": "416",
-            "summary": "A story about discovering a new connection through a fateful meeting.",
-            "tomorrowSummary": "Tomorrow reveals how yesterday’s encounter blossoms into a new adventure.",
-            "servedDate": servedDate,
-            "osType": osType  // OS 정보를 응답에 포함
-          }          
-        };
-      } 
+      }
 
       console.log('더미 데이터 응답:', JSON.stringify(dummyData, null, 2));
       return NextResponse.json(dummyData);
@@ -190,62 +192,6 @@ export async function POST(request: NextRequest) {
       // Android 특화 로직 (예: 특정 프롬프트 조정, 응답 포맷 변경 등)
     } else {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 실제 API 요청됨');
-    }
-    
-    // 필수 필드 검증 (0은 허용, undefined/null/빈 문자열만 누락 처리)
-    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'genre', 'language'];
-    const missing = requiredFields.filter((key) => {
-      const v = (body as unknown as Record<string, unknown>)[key];
-      return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
-    });
-    if (missing.length) {
-      return NextResponse.json(
-        { success: false, error: `필수 정보가 누락되었습니다: ${missing.join(',')}` },
-        { status: 400 }
-      );
-    }
-    
-    // 입력값 검증
-    if (body.birthYear < 1900 || body.birthYear > 2100) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생년도입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthMonth < 1 || body.birthMonth > 12) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생월입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthDay < 1 || body.birthDay > 31) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생일자입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthHour < 0 || body.birthHour > 23) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생시간입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (body.birthMinute < 0 || body.birthMinute > 59) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 출생분입니다.' },
-        { status: 400 }
-      );
-    }
-    
-    if (!['female', 'male', 'nonBinary'].includes(body.gender)) {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 성별입니다.' },
-        { status: 400 }
-      );
     }
 
     // OpenAI API 키 확인
