@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { generatePoetryPrompt, getPoetrySystemPrompt, PoetryRequest, resolveDailyElements } from '@/lib/prompts/sajuPoetry';
+import { generatePoetryPrompt, getPoetrySystemPrompt, PoetryRequest, resolvePoetryDailyElements } from '@/lib/prompts/sajuPoetry';
 
 // OpenAI 클라이언트 초기화 (키가 있을 때만)
 let openai: OpenAI | null = null;
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     console.log('servedDate:', servedDate);
     
     // 날짜 기반 요소를 POST 초기에 계산해 재사용
-    const { genre, item } = resolveDailyElements(servedDate);
+    const { genre, item } = resolvePoetryDailyElements(servedDate);
     console.log('resolvedDaily', { genre, item });
     // 클라이언트 body와 병합하여 이후 동일 변수로 사용
     const finalBody: PoetryRequest = {

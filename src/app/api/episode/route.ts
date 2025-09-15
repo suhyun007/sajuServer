@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest, resolveDailyElements } from '@/lib/prompts/sajuEpisode';
+import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest, resolveEpisodeDailyElements } from '@/lib/prompts/sajuEpisode';
 
 // OpenAI 클라이언트 초기화 (더미 데이터 사용 시에는 초기화하지 않음)
 let openai: OpenAI | null = null;
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     console.log('servedDate:', servedDate);
 
     // 날짜 기반 요소를 POST 초기에 계산해 재사용
-    const { genre, weather, item, plotDevice } = resolveDailyElements(servedDate);
+    const { genre, weather, item, plotDevice } = resolveEpisodeDailyElements(servedDate);
     console.log('resolvedDaily', { genre, weather, item, plotDevice });
     // 클라이언트 body와 병합하여 이후 동일 변수로 사용
     const finalBody: EpisodeRequest = {

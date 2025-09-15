@@ -19,7 +19,7 @@ function pickDaily<T extends readonly string[]>(list: T, seed: string): T[number
   return list[hash % list.length];
 }
 
-export function resolveDailyElements(dateStr: string) {
+export function resolvePoetryDailyElements(dateStr: string) {
   return {
     genre: 'daily',
     item: pickDaily(ALLOWED_ITEMS, `i-${dateStr}`),
