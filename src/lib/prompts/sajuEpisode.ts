@@ -1,15 +1,75 @@
+// ===== Server-side selection lists (moved from client) =====
+const ALLOWED_GENRES = [
+  'romance', 'fantasy', 'comedy', 'drama', 'historical', 'healing',
+  'mystery', 'webNovel', 'classic',
+] as const;
+
+const ALLOWED_WEATHERS = [
+  'sunny', 'cloudy', 'rainy', 'snowy', 'windy', 'foggy', 'stormy',
+] as const;
+
+const ALLOWED_ITEMS = [
+  'letter', 'oldPhoto', 'musicBox', 'umbrella', 'book', 'coffee', 'pendant', 'lantern', 'flower', 'watch',
+  'Guiding lantern', 'Lucky charm', 'Healing crystal', 'Golden key', 'Treasure chest', 'Feather of hope',
+  'Enchanted harp', 'Friendship bracelet', 'Magic ink pen', 'Love letter', 'Eternal candle', 'Blossoming flower',
+  'Starlight pendant', 'Dreamcatcher', 'Rainbow shell', 'Angel’s feather', 'Music box', 'Sunstone', 'Healing herb pouch',
+  'Storybook', 'Sapphire ring', 'Festival mask', 'Dove feather', 'Fortune cookie', 'Secret diary', 'Warm blanket', 'Silver locket',
+  'Harmony flute', 'Memory photograph', 'Garden seed packet', 'Bright ribbon', 'Lantern of wishes', 'Guiding compass',
+  'Magical paintbrush', 'Lucky coin', 'Celebration crown', 'Bottle of fireflies', 'Shooting star charm', 'Happy balloon',
+  'Blooming wreath', 'Traveler’s map', 'Peace bell', 'Rainbow crystal', 'Dream journal', 'Songbird cage', 'Hope scroll',
+  'Candle of friendship', 'Healing potion', 'Birthday cake', 'Sunrise painting',
+] as const;
+
+const ALLOWED_PLOT_DEVICES = [
+  'unexpectedMeeting', 'missedMessage', 'lostAndFound', 'coincidence', 'misunderstanding', 'promise', 'secretRevealed', 'timeConstraint',
+  'weatherTurn', 'helpFromStranger', 'Reunion with a friend', 'Discovery of a hidden talent', 'Receiving a heartfelt gift', 'A letter of gratitude arrives',
+  'Festival lights brighten the night', 'Sharing a secret smile', 'A song that brings healing', 'Forgiveness after conflict', 'Unexpected kindness from a stranger',
+  'A dream that inspires courage', 'A lucky encounter on the street', 'Rediscovering an old passion', 'A child’s laughter changing the mood', 'Planting seeds of hope',
+  'A rainbow after the rain', 'A pet finding its way home', 'Writing the first page of a journal', 'Learning a new skill', 'A surprise celebration', 'Meeting a mentor',
+  'Receiving a message of encouragement', 'Helping someone in need', 'A healing journey begins', 'New friendship formed', 'Overcoming fear with courage',
+  'A warm meal shared together', 'A community gathering', 'Completing a meaningful project', 'An unexpected reunion', 'A festival dance', 'Singing under the stars',
+  'Building something with love', 'Finding beauty in small details', 'Promise of tomorrow', 'A secret revealed brings joy', 'Passing down wisdom',
+  'A story told by a grandparent', 'A journey of self-discovery', 'A heartfelt confession', 'First snowfall of the year', 'Fireworks in celebration',
+  'A guiding dream', 'Someone returns safely', 'Receiving good news', 'Laughter shared around a fire', 'Finding a long-lost letter', 'Crafting something handmade',
+  'Sharing a wish', 'Hopeful sunrise', 'Beginning a new chapter',
+] as const;
+
+function pickDaily<T extends readonly string[]>(list: T, seed: string): T[number] {
+  // Simple deterministic hash → index
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return list[hash % list.length];
+}
+
+export function resolveDailyElements(dateStr: string) {
+  return {
+    genre: pickDaily(ALLOWED_GENRES, `g-${dateStr}`),
+    weather: pickDaily(ALLOWED_WEATHERS, `w-${dateStr}`),
+    item: pickDaily(ALLOWED_ITEMS, `i-${dateStr}`),
+    plotDevice: pickDaily(ALLOWED_PLOT_DEVICES, `p-${dateStr}`),
+  };
+}
+
+type Genre = typeof ALLOWED_GENRES[number];
+type Weather = typeof ALLOWED_WEATHERS[number];
+type Item = typeof ALLOWED_ITEMS[number];
+type PlotDevice = typeof ALLOWED_PLOT_DEVICES[number];
+
 export interface EpisodeRequest {
   gender: 'female' | 'male' | 'nonBinary';
   loveStatus: string;
   currentDate: string;
-  genre: string;
   language: 'ko' | 'en' | 'ja' | 'zh';
   ageGroup: string;
   world: string;
-  weather: string;
-  item: string;
-  plotDevice: string;
+  genre: Genre;
+  weather: Weather;
+  item: Item;
+  plotDevice: PlotDevice;
 }
+
 function getTargetLength(language: string): string {
   switch (language) {
     case 'ko': // 한국어

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { generatePoetryPrompt, getPoetrySystemPrompt, PoetryRequest } from '@/lib/prompts/sajuPoetry';
+import { generatePoetryPrompt, getPoetrySystemPrompt, PoetryRequest, resolveDailyElements } from '@/lib/prompts/sajuPoetry';
 
 // OpenAI 클라이언트 초기화 (키가 있을 때만)
 let openai: OpenAI | null = null;
@@ -101,6 +101,17 @@ export async function POST(request: NextRequest) {
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
     
+    // 날짜 기반 요소를 POST 초기에 계산해 재사용
+    const { genre, item } = resolveDailyElements(servedDate);
+    console.log('resolvedDaily', { genre, item });
+    // 클라이언트 body와 병합하여 이후 동일 변수로 사용
+    const finalBody: PoetryRequest = {
+      ...(body as PoetryRequest),
+      genre,
+      item,
+    } as PoetryRequest;
+    console.log('finalBody for generation:', JSON.stringify(finalBody));
+
     // OS 종류 확인
     const userAgent = request.headers.get('user-agent') || '';
     const customOSHeader = request.headers.get('x-client-os') || '';
@@ -114,7 +125,7 @@ export async function POST(request: NextRequest) {
     console.log('isIOS:', isIOS);
     console.log('isAndroid:', isAndroid);
     
-    const needDummy = true;
+    const needDummy = false;
     const hostHeader = request.headers.get('host') || '';
     const hostname = request.nextUrl.hostname || '';
     const localHosts = ['localhost', '127.0.0.1', '::1', '10.0.2.2'];
@@ -132,7 +143,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if (needDummy || osType =='Android') {
+    if (!isIOS && needDummy) {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       console.log('OS 타입:', osType);
@@ -197,7 +208,7 @@ export async function POST(request: NextRequest) {
     
     // OpenAI를 통한 에피소드 생성
     console.log('OpenAI API 호출 시작...');
-    const poetryData = await generatePoetry(body);
+    const poetryData = await generatePoetry(finalBody);
     console.log('OpenAI 응답 결과:', JSON.stringify(poetryData, null, 2));
     
     const responseData = {

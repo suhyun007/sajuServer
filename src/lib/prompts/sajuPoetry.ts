@@ -1,12 +1,42 @@
+const ALLOWED_ITEMS = [
+  'letter', 'oldPhoto', 'musicBox', 'umbrella', 'book', 'coffee', 'pendant', 'lantern', 'flower', 'watch',
+  'Guiding lantern', 'Lucky charm', 'Healing crystal', 'Golden key', 'Treasure chest', 'Feather of hope',
+  'Enchanted harp', 'Friendship bracelet', 'Magic ink pen', 'Love letter', 'Eternal candle', 'Blossoming flower',
+  'Starlight pendant', 'Dreamcatcher', 'Rainbow shell', 'Angel’s feather', 'Music box', 'Sunstone', 'Healing herb pouch',
+  'Storybook', 'Sapphire ring', 'Festival mask', 'Dove feather', 'Fortune cookie', 'Secret diary', 'Warm blanket', 'Silver locket',
+  'Harmony flute', 'Memory photograph', 'Garden seed packet', 'Bright ribbon', 'Lantern of wishes', 'Guiding compass',
+  'Magical paintbrush', 'Lucky coin', 'Celebration crown', 'Bottle of fireflies', 'Shooting star charm', 'Happy balloon',
+  'Blooming wreath', 'Traveler’s map', 'Peace bell', 'Rainbow crystal', 'Dream journal', 'Songbird cage', 'Hope scroll',
+  'Candle of friendship', 'Healing potion', 'Birthday cake', 'Sunrise painting',
+] as const;
+
+function pickDaily<T extends readonly string[]>(list: T, seed: string): T[number] {
+  // Simple deterministic hash → index
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return list[hash % list.length];
+}
+
+export function resolveDailyElements(dateStr: string) {
+  return {
+    genre: 'daily',
+    item: pickDaily(ALLOWED_ITEMS, `i-${dateStr}`),
+  };
+}
+
+type Item = typeof ALLOWED_ITEMS[number];
+
 export interface PoetryRequest {
   gender: 'female' | 'male' | 'nonBinary';
   loveStatus: string;
   currentDate: string;
-  genre: string;
   language: 'ko' | 'en' | 'ja' | 'zh';
   ageGroup: string;
   world: string;
-  item: string;
+  genre: 'daily';
+  item: Item;
 }
 //user prompt
 export function generatePoetryPrompt(poetryData: PoetryRequest): string {

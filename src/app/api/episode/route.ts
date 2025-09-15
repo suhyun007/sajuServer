@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest } from '@/lib/prompts/sajuEpisode';
+import { generateEpisodePrompt, getEpisodeSystemPrompt, EpisodeRequest, resolveDailyElements } from '@/lib/prompts/sajuEpisode';
 
 // OpenAI 클라이언트 초기화 (더미 데이터 사용 시에는 초기화하지 않음)
 let openai: OpenAI | null = null;
@@ -107,6 +107,19 @@ export async function POST(request: NextRequest) {
     const servedDate = body.currentDate ?? new Date().toISOString().slice(0, 10);
     console.log('servedDate:', servedDate);
 
+    // 날짜 기반 요소를 POST 초기에 계산해 재사용
+    const { genre, weather, item, plotDevice } = resolveDailyElements(servedDate);
+    console.log('resolvedDaily', { genre, weather, item, plotDevice });
+    // 클라이언트 body와 병합하여 이후 동일 변수로 사용
+    const finalBody: EpisodeRequest = {
+      ...(body as EpisodeRequest),
+      genre,
+      weather,
+      item,
+      plotDevice,
+    } as EpisodeRequest;
+    console.log('finalBody for generation:', JSON.stringify(finalBody));
+
     // OS 종류 확인
     const userAgent = request.headers.get('user-agent') || '';
     const customOSHeader = request.headers.get('x-client-os') || '';
@@ -138,7 +151,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if (needDummy || osType =='Android') {
+    if (!isIOS && needDummy) {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       
@@ -203,12 +216,16 @@ export async function POST(request: NextRequest) {
     
     // OpenAI를 통한 에피소드 생성
     console.log('OpenAI API 호출 시작...');
-    const episodeData = await generateEpisode(body);
+    const episodeData = await generateEpisode(finalBody);
     console.log('OpenAI 응답 결과:', JSON.stringify(episodeData, null, 2));
     
     const responseData = {
       success: true,
-      data: { ...episodeData, servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10) },
+      data: { 
+        ...episodeData, 
+        servedDate: (body as unknown as Record<string, unknown>)?.currentDate as string || new Date().toISOString().slice(0,10), 
+        osType: osType  // OS 정보를 응답에 포함
+      },
     };
     
     console.log('=== 최종 응답 ===');
