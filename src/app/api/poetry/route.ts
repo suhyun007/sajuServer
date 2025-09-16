@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     console.log('isIOS:', isIOS);
     console.log('isAndroid:', isAndroid);
     
-    const needDummy = false;
+    const needDummy = true;
     const hostHeader = request.headers.get('host') || '';
     const hostname = request.nextUrl.hostname || '';
     const localHosts = ['localhost', '127.0.0.1', '::1', '10.0.2.2'];
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if (needDummy || isAndroid) {
+    if (isLocalHost || isAndroid) {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       console.log('OS 타입:', osType);
