@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       console.log('알 수 없는 OS 또는 웹 클라이언트에서 요청됨');
     }
 
-    if (isLocalHost || isAndroid) {
+    if (isLocalHost) {
       console.log('더미 데이터 반환 모드');
       console.log('언어:', body.language);
       console.log('OS 타입:', osType);
@@ -164,8 +164,36 @@ export async function POST(request: NextRequest) {
             "osType": osType  // OS 정보를 응답에 포함
           }
         };
-      }else{
-        // 영어 더미 데이터
+      } else if (body.language === 'ja') {
+        // 일본어 더미 데이터
+        dummyData = {
+          success: true,
+          data: {
+            "title": "愛の旅路を待ちながら",
+            "content": "秋の最初の息吹、\n世界全体が黄金色に染まっていく。\n私の心の奥深く、\n愛の種が芽生えることを\n静かに願いながら、\nあの人の香りを思い描く。\n\n憧れの日々、\n告白できない心が、\n青い空の下、\n一緒にいる瞬間を夢見て\n空の星に願いを込める。\n\nこの道の終わりに、\n出会うあなたのために、\n心の準備を整えて\n一歩ずつ前進する。\n\n愛が訪れるその日、\n私の心に咲く\n小さな花たちが、\nあなたと私を繋ぐ\n希望の橋となるだろう。",
+            "contentLength": "400",
+            "summary": "愛の待ち望みと希望を込めた詩。",
+            "tomorrowSummary": "明日は新しい出会いの可能性を語ります。",
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
+          }
+        };
+      } else if (body.language === 'zh') {
+        // 중국어 더미 데이터
+        dummyData = {
+          success: true,
+          data: {
+            "title": "等待爱的旅程",
+            "content": "秋天的第一缕气息，\n整个世界染成了金黄色。\n在我心灵的深处，\n静静地期盼着\n爱的种子发芽，\n描绘着那个人的香气。\n\n思念的日子，\n无法告白的心，\n在蓝天下，\n梦想着共度的时光，\n向天空的星星许愿。\n\n在这条路的尽头，\n为了遇见你，\n我准备好我的心，\n一步一步向前迈进。\n\n当爱到来的那一天，\n在我心中绽放的\n小花朵们，\n将成为连接你我的\n希望之桥。",
+            "contentLength": "400",
+            "summary": "充满爱的等待和希望的诗。",
+            "tomorrowSummary": "明天将讲述新相遇的可能性。",
+            "servedDate": servedDate,
+            "osType": osType  // OS 정보를 응답에 포함
+          }
+        };
+      } else {
+        // 영어 더미 데이터 (기본값)
         dummyData = {
           success: true,
           data: {
