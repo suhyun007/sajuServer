@@ -58,12 +58,15 @@ type Item = typeof ALLOWED_ITEMS[number];
 type PlotDevice = typeof ALLOWED_PLOT_DEVICES[number];
 
 export interface EpisodeRequest {
-  gender: 'female' | 'male' | 'nonBinary';
-  loveStatus: string;
+  gender?: 'female' | 'male' | 'nonBinary';  // 선택 사항
+  tone?: string;                              // 선택 사항
   currentDate: string;
   language: 'ko' | 'en' | 'ja' | 'zh';
-  ageGroup: string;
-  world: string;
+  ageGroup?: string;                          // 선택 사항
+  world?: string;                             // 선택 사항
+  growthTheme?: string;                       // 성장 테마 (영어 키값)
+  loveRelation?: string;                      // 사랑/관계 (영어 키값)
+  worldAction?: string;                       // 세상/행동 (영어 키값)
   genre: Genre;
   weather: Weather;
   item: Item;
@@ -75,26 +78,34 @@ function getTargetLength(language: string): string {
     case 'ko': // 한국어
     case 'ja': // 일본어
     case 'zh': // 중국어
-      return 'around 400–450 characters';
+      return 'around 400–500 characters (approximately 6–8 sentences)';
     default:   // 영어
-      return 'around 600–700 characters';
+      return 'around 600–750 characters (approximately 5–7 sentences)';
   }
 }
 
 export function generateEpisodePrompt(episodeData: EpisodeRequest): string {
-  const { gender, loveStatus, currentDate, genre, language, ageGroup, world, weather, item, plotDevice } = episodeData;
+  const { gender, tone, currentDate, genre, language, ageGroup, world, weather, item, plotDevice, growthTheme, loveRelation, worldAction } = episodeData;
   
   const languageLabel =
     language === 'ko' ? 'Korean' :
     language === 'ja' ? 'Japanese' :
     language === 'zh' ? 'Chinese' : 'English';
+  
+  // 모든 캐릭터 정보를 동적으로 추가
+  const characterElements = [];
+  if (ageGroup) characterElements.push(`   - Age group of the main character: ${ageGroup}`);
+  if (gender) characterElements.push(`   - Gender of the main character: ${gender}`);
+  if (world) characterElements.push(`   - Story world or background: ${world}`);
+  if (tone) characterElements.push(`   - Tone or emotional mood: ${tone}`);
+  if (growthTheme) characterElements.push(`   - Growth theme: ${growthTheme}`);
+  if (loveRelation) characterElements.push(`   - Love/Relationship: ${loveRelation}`);
+  if (worldAction) characterElements.push(`   - World/Action: ${worldAction}`);
+  
   return `
 Write a short episode using the following inputs:
 1. Incorporate the following inputs naturally into the story:
-   - Age group of the main character: ${ageGroup}
-   - Gender of the main character: ${gender}
-   - Story world or background: ${world}
-   - Tone or emotional mood: ${loveStatus}
+${characterElements.length > 0 ? characterElements.join('\n') : ''}
    - Current date: ${currentDate}
    - Genre: ${genre}
    - Weather: ${weather}
@@ -110,16 +121,25 @@ export function getEpisodeSystemPrompt(language: string): string {
     language === 'ko' ? 'Korean' :
     language === 'ja' ? 'Japanese' :
     language === 'zh' ? 'Chinese' : 'English';
-    
+  
+  // 언어별 톤 지시사항
+  const toneInstruction =
+  language === 'ko' ? 'Use a warm and emotionally immersive tone, like a scene from a modern Korean short story.'
+    : language === 'ja' ? 'Write with subtle emotions and detailed atmosphere, as in a Japanese short fiction piece.'
+    : language === 'zh' ? 'Use elegant and expressive language, evoking the style of modern Chinese narrative prose.'
+    : 'Write in expressive, cinematic English reminiscent of modern literary fiction.';
+
   return `You are a professional fiction writer who creates short daily episodes,
 designed to feel like a small piece of literature delivered each day.
 Guidelines:
-1. Write in ${languageLabel}.
-2. Keep the tone immersive, warm, and meaningful, as if offering readers a small gift for the day.
-4. Focus on beauty, imagination, and emotional depth rather than predictions or fortune.
-5. Write a short episode that feels like a brief but complete story. 
+1.Do not explicitly mention the chosen items. Incorporate them naturally into the story or poem so that the narrative flows smoothly.
+2. Write in ${languageLabel}.
+3. Keep the tone immersive and meaningful, as if offering readers a small gift for the day.
+4. ${toneInstruction}
+5. Focus on beauty, imagination, and emotional depth rather than predictions or fortune.
+6. Write a short episode that feels like a brief but complete story. 
  For ${languageLabel}, aim for approximately ${getTargetLength(language)} in length.
-6. Return only valid JSON in the following format:
+7. Return only valid JSON in the following format:
 {
   "title": "Episode title",
   "content": "Episode content",

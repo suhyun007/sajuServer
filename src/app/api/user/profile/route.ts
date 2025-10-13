@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, email, name, birthDate, birthHour, birthMinute, gender, location, loveStatus } = body;
+    const { userId, email, name, birthDate, birthHour, birthMinute, gender, location, tone } = body;
 
     const { data, error } = await supabaseAdmin
       .from('user_profiles')
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         birth_minute: birthMinute,
         gender,
         location,
-        love_status: loveStatus,
+        love_status: tone,
         updated_at: new Date().toISOString()
       })
       .select()

@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
     }
     
     // 필수 필드 검증
-    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'loveStatus', 'currentDate', 'language'];
+    const requiredFields = ['birthYear', 'birthMonth', 'birthDay', 'birthHour', 'birthMinute', 'gender', 'location', 'tone', 'currentDate', 'language'];
     for (const field of requiredFields) {
       const value = body[field as keyof SajuRequest];
       console.log(`필드 ${field} 값:`, value, '타입:', typeof value);
