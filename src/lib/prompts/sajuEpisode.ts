@@ -78,9 +78,9 @@ function getTargetLength(language: string): string {
     case 'ko': // 한국어
     case 'ja': // 일본어
     case 'zh': // 중국어
-      return 'around 400–500 characters (approximately 6–8 sentences)';
+      return 'around 900–1200 characters (approximately 8–12 sentences)';
     default:   // 영어
-      return 'around 600–750 characters (approximately 5–7 sentences)';
+      return 'around 1000–1400 characters (approximately 8–12 sentences)';
   }
 }
 

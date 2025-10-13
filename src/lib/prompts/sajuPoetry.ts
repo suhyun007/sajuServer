@@ -87,8 +87,8 @@ export function getPoetrySystemPrompt(language: string): string {
   // 언어별 길이 조정 (시라서 에피소드보다 짧게)
   const targetLength =
   language === 'ko' || language === 'ja' || language === 'zh'
-    ? 'around 250–300 characters (approximately 4–6 lines of verse)'
-    : 'around 400–450 characters (approximately 4–6 lines of verse)';
+    ? 'around 600–800 characters (approximately 10–14 lines of verse)'
+    : 'around 800–900 characters (approximately 10-14 lines of verse)';
 
   return `You are a professional poet who creates short daily poems,
   designed to feel like a delicate gift of words each day.
