@@ -63,7 +63,7 @@ export interface EpisodeRequest {
   currentDate: string;
   language: 'ko' | 'en' | 'ja' | 'zh';
   ageGroup?: string;                          // 선택 사항
-  world?: string;                             // 선택 사항
+  world?: string;                             // 선택 사항 캐릭터 세계
   growthTheme?: string;                       // 성장 테마 (영어 키값)
   loveRelation?: string;                      // 사랑/관계 (영어 키값)
   worldAction?: string;                       // 세상/행동 (영어 키값)
@@ -106,7 +106,6 @@ export function generateEpisodePrompt(episodeData: EpisodeRequest): string {
 Write a short episode using the following inputs:
 1. Incorporate the following inputs naturally into the story:
 ${characterElements.length > 0 ? characterElements.join('\n') : ''}
-   - Current date: ${currentDate}
    - Genre: ${genre}
    - Weather: ${weather}
    - Object/item: ${item}
@@ -132,7 +131,7 @@ export function getEpisodeSystemPrompt(language: string): string {
   return `You are a professional fiction writer who creates short daily episodes,
 designed to feel like a small piece of literature delivered each day.
 Guidelines:
-1.Do not explicitly mention the chosen items. Incorporate them naturally into the story or poem so that the narrative flows smoothly.
+1. Do NOT explicitly mention the story world. Incorporate these concepts subtly if needed.
 2. Write in ${languageLabel}.
 3. Keep the tone immersive and meaningful, as if offering readers a small gift for the day.
 4. ${toneInstruction}

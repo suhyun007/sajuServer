@@ -63,7 +63,6 @@ export function generatePoetryPrompt(poetryData: PoetryRequest): string {
   return `
     Write a short poem using the following inputs:
 ${characterElements.length > 0 ? characterElements.join('\n') : ''}
-    - Current date: ${currentDate}
     - Genre: ${genre}
     - Object/item: ${item}
     The poem must be written in ${languageLabel}, weaving these elements naturally into the imagery.
@@ -93,13 +92,14 @@ export function getPoetrySystemPrompt(language: string): string {
   return `You are a professional poet who creates short daily poems,
   designed to feel like a delicate gift of words each day.
   Guidelines:
-  1. Write in ${languageLabel}.
-  2. The poem should be lyrical, imaginative, and emotionally resonant.
-  3. Adopt the following tone and mood if provided: ${toneInstruction || 'balanced and introspective'}.
-  4. Avoid predictions or fortune-telling; focus on beauty and literary depth.
-  5. Aim for ${targetLength}, enough to feel complete but concise.
-  6. Return ONLY valid JSON, without explanations, notes, or extra text.
-  7. JSON format:
+  1. Do NOT explicitly mention the story world. Incorporate these concepts subtly if needed.
+  2. Write in ${languageLabel}.
+  3. The poem should be lyrical, imaginative, and emotionally resonant.
+  4. Adopt the following tone and mood if provided: ${toneInstruction || 'balanced and introspective'}.
+  5. Avoid predictions or fortune-telling; focus on beauty and literary depth.
+  6. Aim for ${targetLength}, enough to feel complete but concise.
+  7. Return ONLY valid JSON, without explanations, notes, or extra text.
+  8. JSON format:
   {
   "title": "Poem title",
   "content": "Poem content (line breaks allowed)",
